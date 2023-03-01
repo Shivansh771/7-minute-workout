@@ -43,7 +43,7 @@
         <ProgressBar
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:id="@+id/progressbar"
+            android:id="@+id/flRestView"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_gravity="center"
             android:max="10"
@@ -68,6 +68,34 @@
                 android:id="@+id/tvTimer"/>
         </LinearLayout>
     </FrameLayout>
+    <pl.droidsonroids.gif.GifImageView
+        android:id="@+id/ivImage"
+
+
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/jumpingjacks"
+        android:visibility="invisible"
+        android:contentDescription="image"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/tvExercise"
+        app:layout_constraintTop_toBottomOf="@id/toolbarExercise"
+        app:layout_constraintTop_toTopOf="parent"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvExercise"
+        android:text="Exercise Name"
+        android:textColor="@color/theme"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivImage"
+        tools:visibility="visible"/>
     <FrameLayout
         android:id="@+id/flExerciseView"
         tools:visibility="visible"
@@ -79,7 +107,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbarExercise">
+
+        app:layout_constraintTop_toBottomOf="@id/tvExercise">
 
         <ProgressBar
             android:layout_width="100dp"
@@ -88,6 +117,7 @@
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_gravity="center"
             android:max="30"
+
             android:indeterminate="false"
             android:background="@drawable/circular_progress_bar_grey"
             android:progressDrawable="@drawable/circular_progress_bar"
