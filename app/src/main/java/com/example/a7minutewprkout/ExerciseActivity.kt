@@ -1,20 +1,28 @@
 package com.example.a7minutewprkout
 
+import android.media.MediaPlayer
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.speech.tts.TextToSpeech
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.example.a7minutewprkout.databinding.ActivityExercise2Binding
+import java.util.*
+import kotlin.collections.ArrayList
 
-class ExerciseActivity : AppCompatActivity() {
+class ExerciseActivity : AppCompatActivity(),TextToSpeech.OnInitListener {
     private var binding:ActivityExercise2Binding?=null
     private var restTimer:CountDownTimer?=null
     private var restProgress=0
     private var exerciseTimer:CountDownTimer?=null
     private var exerciseProgress=0
+    private var player:MediaPlayer?=null
     private var exerciseList:ArrayList<ExerciseModel>?=null
     private var currentExercisePosition=-1
+    private var tts:TextToSpeech?=null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding= ActivityExercise2Binding.inflate(layoutInflater)
@@ -23,12 +31,41 @@ class ExerciseActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         exerciseList=Constants.defaultExerciseList()
+        tts= TextToSpeech(this,this)
         binding?.toolbarExercise?.setNavigationOnClickListener{
             onBackPressed()
         }
 setupRestView()
     }
+
+   override fun onInit(status: Int){
+        if(status==TextToSpeech.SUCCESS){
+            val result=tts?.setLanguage(Locale.US)
+            if(result==TextToSpeech.LANG_NOT_SUPPORTED || result==TextToSpeech.LANG_MISSING_DATA){
+                Log.e("TTS","The language specified is not supported!")
+
+            }
+        }
+            else{
+                Log.e("TTS","Initialization failed!")
+            }
+        }
+
+    private fun speakOut(text : String){
+        tts!!.speak(text,TextToSpeech.QUEUE_FLUSH,null,"")
+    }
+
     private fun setupRestView(){
+        try{
+            val soundURI= Uri.parse("android.resource://com.example.a7minutewprkout/"+R.raw.app_src_main_res_raw_press_start)
+            player=MediaPlayer.create(applicationContext,soundURI)
+            player?.isLooping=false
+
+            player?.start()
+        }catch(e:Exception){
+            e.printStackTrace()
+        }
+
         binding?.flRestView?.visibility= View.VISIBLE //if we use GONE the text will align at the center as tvTitle is linked with flProgressBar(Rest Bar)
         binding?.tvTitle?.visibility=View.VISIBLE
         binding?.tvExercise?.visibility=View.INVISIBLE
@@ -51,6 +88,7 @@ setupRestView()
             exerciseTimer?.cancel()
             exerciseProgress=0
         }
+        speakOut(exerciseList!![currentExercisePosition].getname())
         binding?.ivImage?.setImageResource(exerciseList!![currentExercisePosition].getImage())
         binding?.tvExercise?.text=exerciseList!![currentExercisePosition].getname()
         setExerciseProgressBar()
@@ -99,7 +137,6 @@ setupRestView()
 
 
     override fun onDestroy() {
-        super.onDestroy()
         if(restTimer!=null){
             restTimer?.cancel()
             restProgress =0
@@ -108,6 +145,17 @@ setupRestView()
             exerciseTimer?.cancel()
             exerciseProgress=0
         }
+        //shutting down the tts feature when activity is destroyed
+        //START
+        if(player!=null){
+            player!!.stop()
+        }
+        if(tts!=null){
+            tts!!.stop()
+            tts!!.shutdown()
+        }
+        super.onDestroy()
         binding=null
+
     }
 }
