@@ -9,17 +9,20 @@ import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.a7minutewprkout.databinding.ActivityExercise2Binding
 import java.util.*
 import kotlin.collections.ArrayList
 
-class ExerciseActivity : AppCompatActivity(),TextToSpeech.OnInitListener {
+class  ExerciseActivity : AppCompatActivity(),TextToSpeech.OnInitListener {
     private var binding:ActivityExercise2Binding?=null
     private var restTimer:CountDownTimer?=null
     private var restProgress=0
     private var exerciseTimer:CountDownTimer?=null
     private var exerciseProgress=0
     private var player:MediaPlayer?=null
+
+    private var exerciseAdapter: ExerciseStatusAdapter?=null
     private var exerciseList:ArrayList<ExerciseModel>?=null
     private var currentExercisePosition=-1
     private var tts:TextToSpeech?=null
@@ -36,6 +39,7 @@ class ExerciseActivity : AppCompatActivity(),TextToSpeech.OnInitListener {
             onBackPressed()
         }
 setupRestView()
+        setupExerciseStatusRecyclerView()
     }
 
    override fun onInit(status: Int){
@@ -54,7 +58,11 @@ setupRestView()
     private fun speakOut(text : String){
         tts!!.speak(text,TextToSpeech.QUEUE_FLUSH,null,"")
     }
-
+    private fun setupExerciseStatusRecyclerView(){
+        binding?.rvExerciseStatus?.layoutManager=LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false)
+        exerciseAdapter= ExerciseStatusAdapter(exerciseList!!)
+        binding?.rvExerciseStatus?.adapter=exerciseAdapter
+    }
     private fun setupRestView(){
         try{
             val soundURI= Uri.parse("android.resource://com.example.a7minutewprkout/"+R.raw.app_src_main_res_raw_press_start)
@@ -106,6 +114,8 @@ setupRestView()
 
             override fun onFinish() {
                 currentExercisePosition++
+                exerciseList!![currentExercisePosition].setIsSelected(true)
+                exerciseAdapter!!.notifyDataSetChanged()
                 setUpExerciseView()
             }
 
@@ -123,6 +133,12 @@ setupRestView()
             }
 
             override fun onFinish() {
+
+                exerciseList!![currentExercisePosition].setIsSelected(false)
+                exerciseList!![currentExercisePosition].setIsCompleted(true)
+
+                exerciseAdapter!!.notifyDataSetChanged()
+                setUpExerciseView()
                 if(currentExercisePosition<exerciseList?.size!!-1){
                     setupRestView()
                 }
