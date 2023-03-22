@@ -10,18 +10,19 @@ import com.example.a7minutewprkout.databinding.ActivityMainBinding
 import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
-    //  The binding is name just like the name of the layout with Binding attached
-    //Todo 1:We create a variable for it and assign to null
+
     private var binding:ActivityMainBinding? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //Todo 2: We inflate the late file by calling inflate on the Binding name
         binding = ActivityMainBinding.inflate(layoutInflater)
-        //Todo 3: Then replace the setContentView parameter with binding?.root
         setContentView(binding?.root)
 
         binding?.flStart?.setOnClickListener {
             val intent = Intent(this,ExerciseActivity::class.java)
+            startActivity(intent)
+        }
+        binding?.flBMI?.setOnClickListener {
+            val intent = Intent(this,BMIActivity::class.java)
             startActivity(intent)
         }
     }
